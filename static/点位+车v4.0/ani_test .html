@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        background-color: #2a3b4c;
+        width: 100%;
+        height: 100%;
+      }
+      div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        width: 0.7rem;
+        height: 0.7rem;
+        -webkit-animation: ani 0.8s linear infinite;
+      }
+      img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0.9rem;
+        height: 0.9rem;
+        /* border-radius:50%; */
+        /* -webkit-animation: ani 1s linear infinite; */
+        /* animation-duration:10s; */
+      }
+
+      @keyframes ani {
+        0% {
+          border: 2px solid rgba(255, 0, 0, 0.1);
+          box-shadow: 0 0 0px red;
+        }
+        25% {
+          border: 4px solid rgba(255, 0, 0, 0.2);
+          box-shadow: 0 0 2px red;
+        }
+        50% {
+          border: 6px solid rgba(255, 0, 0, 0.3);
+          box-shadow: 0 0 5px red;
+        }
+        75% {
+          border: 8px solid rgb(255, 0, 0, 0.2);
+          box-shadow: 0 0 4px red;
+        }
+        100% {
+          border: 10px solid rgba(255, 0, 0, 0.1);
+          box-shadow: 0 0 2px red;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <img src="./img/agv.png" alt="" />
+    </div>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+@keyframes aniRed {
+  0% {
+    stroke: red;
+    stroke-width: 2;
+    fill: red;
+    opacity: 0.1;
+    r: 10;
+    stroke-opacity: 0.1;
+  }
+  25% {
+    stroke: red;
+    stroke-width: 5;
+    fill: red;
+    opacity: 0.3;
+    r: 15;
+    stroke-opacity: 0.3;
+  }
+  50% {
+    stroke: red;
+    stroke-width: 8;
+    r: 20;
+    stroke-opacity: 0.5;
+  }
+  75% {
+    stroke: red;
+    stroke-width: 5;
+    fill: red;
+    opacity: 0.3;
+    r: 15;
+    stroke-opacity: 0.3;
+  }
+  100% {
+    stroke: red;
+    stroke-width: 2;
+    r: 10;
+    fill: red;
+    opacity: 0.1;
+    stroke-opacity: 0.1;
+  }
+}
+
+@keyframes aniGreen {
+  0% {
+    stroke: green;
+    stroke-width: 2;
+    fill: green;
+    opacity: 0.1;
+    r: 10;
+    stroke-opacity: 0.1;
+  }
+  25% {
+    stroke: green;
+    stroke-width: 5;
+    fill: green;
+    opacity: 0.3;
+    r: 15;
+    stroke-opacity: 0.3;
+  }
+  50% {
+    stroke: green;
+    stroke-width: 8;
+    r: 20;
+    stroke-opacity: 0.5;
+  }
+  75% {
+    stroke: green;
+    stroke-width: 5;
+    fill: green;
+    opacity: 0.3;
+    r: 15;
+    stroke-opacity: 0.3;
+  }
+  100% {
+    stroke: green;
+    stroke-width: 2;
+    r: 10;
+    fill: green;
+    opacity: 0.1;
+    stroke-opacity: 0.1;
+  }
+}
+
+#mapDiv {
+  
+}
+
+#searchMapArea {
+  position: absolute;
+  left: 5%;
+  top: 3%;
+  z-index: 5;
+  opacity: 0.8;
+  width: 280px;
+}
+
+#searchMapArea .dropdown-menu {
+  min-width: 5rem;
+}
+
+
+#agvInfoCard {
+  width: 18rem;
+  visibility:hidden;
+  position: absolute;
+  right: 2%;
+  top: 3%;
+  z-index: 5;
+  opacity: 0.9;
+}

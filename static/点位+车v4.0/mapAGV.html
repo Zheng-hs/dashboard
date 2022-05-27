@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./map.js"></script>
+    <script src="./agv.js"></script>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      @keyframes aniRed {
+        0% {
+          stroke: red;
+          stroke-width: 2;
+          fill: red;
+          opacity: 0.1;
+          r: 10;
+          stroke-opacity: 0.1;
+        }
+        25% {
+          stroke: red;
+          stroke-width: 5;
+          fill: red;
+          opacity: 0.3;
+          r: 15;
+          stroke-opacity: 0.3;
+        }
+        50% {
+          stroke: red;
+          stroke-width: 8;
+          r: 20;
+          stroke-opacity: 0.5;
+        }
+        75% {
+          stroke: red;
+          stroke-width: 5;
+          fill: red;
+          opacity: 0.3;
+          r: 15;
+          stroke-opacity: 0.3;
+        }
+        100% {
+          stroke: red;
+          stroke-width: 2;
+          r: 10;
+          fill: red;
+          opacity: 0.1;
+          stroke-opacity: 0.1;
+        }
+      }
+
+      @keyframes aniGreen {
+        0% {
+          stroke: green;
+          stroke-width: 2;
+          fill: green;
+          opacity: 0.1;
+          r: 10;
+          stroke-opacity: 0.1;
+        }
+        25% {
+          stroke: green;
+          stroke-width: 5;
+          fill: green;
+          opacity: 0.3;
+          r: 15;
+          stroke-opacity: 0.3;
+        }
+        50% {
+          stroke: green;
+          stroke-width: 8;
+          r: 20;
+          stroke-opacity: 0.5;
+        }
+        75% {
+          stroke: green;
+          stroke-width: 5;
+          fill: green;
+          opacity: 0.3;
+          r: 15;
+          stroke-opacity: 0.3;
+        }
+        100% {
+          stroke: green;
+          stroke-width: 2;
+          r: 10;
+          fill: green;
+          opacity: 0.1;
+          stroke-opacity: 0.1;
+        }
+      }
+
+      #mapDiv {
+        
+      }
+
+      #searchMapArea {
+        position: absolute;
+        left: 5%;
+        top: 3%;
+        z-index: 5;
+        opacity: 0.8;
+        width: 280px;
+      }
+
+      #searchMapArea .dropdown-menu {
+        min-width: 5rem;
+      }
+
+
+      #agvInfoCard {
+        width: 18rem;
+        visibility:hidden;
+        position: absolute;
+        right: 2%;
+        top: 3%;
+        z-index: 5;
+        opacity: 0.9;
+      }
+
+    </style>
+    <script src="./js/bootstrap-5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      href="./js/bootstrap-5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="mapDiv">
+      <!-- 搜索框  -->
+      <div id="searchMapArea" class="btn-group" >
+        <div class="btn-group" role="group">
+          <button id="btnGroupDrop1" type="button" class="btn  btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" >
+            <span id="searchObject" value='point'>点位</span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="width: 25%;">
+            <li><a class="dropdown-item" value='agv' onclick="selectSearchObject('agv','车号')">车号</a></li>
+            <li><a class="dropdown-item" value='point' onclick="selectSearchObject('point','点位')" >点位</a></li>
+          </ul>
+        </div>
+        <input
+          id="searchContent"
+          type="text"
+          class="form-control input-group-addon "
+          aria-label="Text input with dropdown button"
+        />
+        <span class="input-group-addon btn btn-primary" onclick=locateSearchObject()>
+          <!-- 搜索 -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"></path>
+          </svg>
+        </span>
+      </div>
+
+      <!-- agv信息面板 -->
+      <div id="agvInfoCard" class="card" style="">
+        <div class="modal-header">
+          <h5 id="agvInfoCardTitle" class="modal-title card-title ">Modal title</h5>
+          <button id="agvInfoCardCloseBtn" onclick="agvInfoCardClose()" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- <p class="card-text" > Modal body text goes here.</p> -->
+          <!-- table -->
+          <table class="table table-striped table-hover">
+            <tbody>
+              <tr>
+                <td>车体区域</td>
+                <td id="AgvAreaInfo">@fat</td>
+              </tr>
+              <tr>
+                <td>车体停止原因</td>
+                <td id="AgvStopReasonSInfo">@fat</td>
+              </tr>
+              <tr>
+                <td>当前电量</td>
+                <td id="BatteryLevelInfo">@fat</td>
+              </tr>
+              <tr>
+                <td>当前卡号</td>
+                <td id="RfidNowInfo">@fat</td>
+              </tr>
+              <tr>
+                <td>速度</td>
+                <td id="SpeedLevelInfo">@fat</td>
+              </tr>
+              <tr>
+                <td>任务状态</td>
+                <td id="TaskStateInfo">@fat</td>
+              </tr>
+              <!-- <tr>
+                <td colspan="2">Larry the Bird</td>
+                <td>@twitter</td>
+                <td>@twitter</td>
+              </tr> -->
+            </tbody>
+          </table>
+          <!-- table -->
+        </div>
+      </div>                
+
+      <!-- 地图 -->
+      <svg xmlns="http://www.w3.org/2000/svg" id="svgMap" height="100%" width="100%"></svg>
+    </div>
+
+    
+
+    <div class="btn-area">
+      <button id="scroll-up">↑</button>
+      <button id="scroll-down">↓</button>
+      <button id="scroll-left">←</button>
+      <button id="scroll-right">→</button>
+      <button id="scale-up">＋</button>
+      <button id="scale-down">－</button>
+      <button id="reset-btn">♨</button>
+      <input type="text" id="pointName" value="" />
+      <button id="point-locate-btn">定位</button>
+      <input type="text" id="agvName" value="" />
+      <button id="agv-locate-btn">定位</button>
+    </div>
+  </body>
+
+  <script src="./js/jquery-3.5.1.min.js"></script>
+  <!-- <script src="./js/jquery.svg.pan.zoom.js"></script> -->
+  <script src="./js/d3.min.js"></script>
+  <script>
+    mapdata
+    agvListDate
+    var scale
+    var mapObj
+    var svgPanZoom
+    var searchPointRes = {
+      pointName: '',
+      pointList: [],
+      selectNum: 0,
+      lastPoint: null,
+    }
+
+    var searchAgvRes = {
+      agvName: '',
+      agvList: [],
+      selectNum: 0,
+      lastAgv: null,
+    }
+
+    var agvInfoClick = null
+
+    var svgNS = 'http://www.w3.org/2000/svg'
+    var oParent = document.getElementById('mapDiv')
+    var oSvg = document.getElementById('svgMap')
+
+    function createSvgTag(tag, objAttr) {
+      var oTag = document.createElementNS(svgNS, tag)
+      for (var attr in objAttr) {
+        oTag.setAttribute(attr, objAttr[attr])
+      }
+      return oTag
+    }
+
+    
+
+
+    function structMapdata(mapdata) {
+      ret = {}
+      mapdata.forEach((point) => {
+        let pointName = point.CurrentPoint
+        let pointData = point
+        ret[pointName] = point
+      })
+      return ret
+    }
+
+
+    function structAgvListDate(agvListDate) {
+      ret = {}
+      agvListDate.rows.forEach((agv) => {
+        let agvName = agv.AgvId
+        let agvData = agv
+        ret[agvName] = agvData
+      })
+      return ret
+    }
+
+    function getScale(mapdata) {
+      let winX = window.innerWidth * 0.95
+      let winY = window.innerHeight * 0.95
+      let maxX = winX
+      let maxY = winY
+
+      mapdata.forEach((point) => {
+        if (point.Map_x > maxX) {
+          maxX = point.Map_x
+        }
+        if (point.Map_y > maxY) {
+          maxY = point.Map_y
+        }
+      })
+
+      let scale1 = winX / maxX
+      let scale2 = winY / maxY
+
+      return scale1 > scale2 ? scale2 : scale1
+    }
+
+    function switchRfid(pointNum) {
+      let pointNumIndex = pointNum.indexOf('-')
+      let realPointNum = 0
+      if (pointNum.toUpperCase().indexOf('PO') != -1) {
+        realPointNum =
+          Number(pointNum.substring(pointNumIndex + 1)) + 1000000000
+      } else if (pointNum.toUpperCase().indexOf('QR') != -1) {
+        realPointNum = Number(pointNum.substring(pointNumIndex + 1)) + 12000000
+      }
+
+      return realPointNum
+    }
+
+    function switchPo(rfid) {
+      let rfidNum = Number(rfid)
+      let pointNum = 0
+      if (rfidNum > 1000000000) {
+        pointNum = 'Po-' + (rfid - 1000000000)
+      } else if (rfidNum > 10000000 && rfidNum < 1000000000) {
+        pointNum = 'Qr-' + (rfid - 1000000000)
+      }
+      return pointNum
+    }
+
+    function switchAngle(radian) {
+      return (radian * 180) / Math.PI
+    }
+
+    function switchRadian(angle) {
+      return (angle * Math.PI) / 180
+    }
+
+    function objectFocus(point, oSvg, pointSize, pointFontSize) {
+      let pointStrokeColor = '#98999c'
+      // let pointInfoFontColor = '#804000'
+      let pointInfoFontColor = '#804000'
+      let pointFontBgColor = '#d5d5d5'
+      let pointFontBgStrokeColor = '#383838'
+
+      // let pointFontSize = pointFontSize
+      let pointSelect = document.getElementById(point.CurrentPoint)
+      if (pointSelect != null) {
+        pointSelect.setAttribute('stroke', pointStrokeColor)
+        pointSelect.setAttribute('stroke-width', pointFontSize / 10)
+        pointSelect.setAttribute('stroke-opti', 0.8)
+      }
+
+      let fontTagIsExist = document.getElementById(point.CurrentPoint + 'Info')
+      if (fontTagIsExist == null) {
+        // let pointNumIndex = point.CurrentPoint.indexOf('-')
+        // let realPointNum = Number(point.CurrentPoint.substring(pointNumIndex +1)) + 1000000000
+        let pointFontInitX = point.Map_x * scale
+        let pointFontInitY = point.Map_y * scale - pointSize - pointFontSize
+        let pointFontTag = createSvgTag('text', {
+          id: point.CurrentPoint + 'Font',
+          class: 'pointFontTag',
+          x: pointFontInitX,
+          y: pointFontInitY,
+          'font-size': pointFontSize,
+          fill: pointInfoFontColor,
+          'text-anchor': 'middle',
+          // 'style': 'cursor: pointer;',
+        })
+
+        pointFontTag.innerHTML = point.RawRfidValue
+
+        let pointFontBgHeight = pointFontSize * 1.8
+        let pointFontBgWidth =
+          String(point.RawRfidValue).length * pointFontSize * 0.8
+        let pointFontBgInitX = point.Map_x * scale - pointFontBgWidth / 2
+        let pointFontBgInitY =
+          point.Map_y * scale -
+          pointFontBgHeight / 2 -
+          pointSize -
+          pointFontSize * 1.3
+        let pointFontBgTag = createSvgTag('rect', {
+          id: point.CurrentPoint + 'FontBg',
+          class: 'pointFontBgTag',
+          x: pointFontBgInitX,
+          y: pointFontBgInitY,
+          width: pointFontBgWidth,
+          height: pointFontBgHeight,
+          rx: (pointFontSize * 2) / 5,
+          ry: (pointFontSize * 2) / 5,
+          fill: pointFontBgColor,
+          stroke: pointFontBgStrokeColor,
+          opacity: 0.8,
+          'stroke-width': pointFontSize / 10,
+        })
+
+        let pointInfoTag = createSvgTag('g', {
+          id: point.CurrentPoint + 'Info',
+          style: 'cursor: pointer;',
+        })
+
+        pointInfoTag.appendChild(pointFontBgTag)
+        pointInfoTag.appendChild(pointFontTag)
+        //
+        //
+
+        oSvg.appendChild(pointInfoTag)
+      }
+    }
+
+    function objectBlur(point, oSvg) {
+      let pointSelect = document.getElementById(point.CurrentPoint)
+      // console.log(point);
+      if (pointSelect != null) {
+        pointSelect.removeAttribute('stroke')
+        pointSelect.removeAttribute('stroke-width')
+        pointSelect.removeAttribute('stroke-opti')
+      }
+      // console.log(pointSelect);
+      let fontTag = document.getElementById(point.CurrentPoint + 'Info')
+      if (fontTag != null) {
+        oSvg.removeChild(fontTag)
+      }
+    }
+
+
+    function agvInfoCardUpdate(agv) {
+      agvInfoClick = agv.AgvId
+      
+      let agvInfoCardTitle = document.getElementById('agvInfoCardTitle')
+      let AgvAreaInfo = document.getElementById('AgvAreaInfo')
+      let AgvStopReasonSInfo = document.getElementById('AgvStopReasonSInfo')
+      let BatteryLevelInfo = document.getElementById('BatteryLevelInfo')
+      let RfidNowInfo = document.getElementById('RfidNowInfo')
+      let SpeedLevelInfo = document.getElementById('SpeedLevelInfo')
+      let TaskStateInfo = document.getElementById('TaskStateInfo')
+      agvInfoCardTitle.innerText = agv.AgvId
+      AgvAreaInfo.innerText = agv.AgvArea
+      // console.log(agv.AgvStopReasonS)
+      // agv.AgvStopReasonS = JSON.parse(agv.AgvStopReasonS)
+      if(agv.AgvStopReasonS.length ==0 || agv.AgvStopReasonS[0] == ''){
+        AgvStopReasonSInfo.innerText = '无'
+      }else{
+        AgvStopReasonSInfo.innerText = agv.AgvStopReasonS
+      }
+      
+      BatteryLevelInfo.innerText = agv.BatteryLevel + '%'
+      RfidNowInfo.innerText = agv.RfidNow
+      SpeedLevelInfo.innerText = agv.SpeedLevel
+      // agv.TaskList = JSON.parse(agv.TaskList)
+      // console.log(agv.TaskList.length);
+      if(agv.TaskList.length == 0 ){
+        TaskStateInfo.innerText = '无任务'
+      }else{
+        TaskStateInfo.innerText = '任务中'
+      }
+    }
+
+
+    function agvClick(agv) {
+      // console.log(agv)
+      let agvInfoCard = document.getElementById('agvInfoCard')
+      agvInfoCard.style.visibility = 'visible'
+
+      agvInfoCardUpdate(agv)
+      
+    }
+
+    function agvFocus(agv, oSvg) {
+      let agvSelect = document.getElementById(agv.AgvId)
+      let agvInfoSelect = document.getElementById(agv.AgvId + 'Info')
+      if (agvSelect != null && agvInfoSelect != null) {
+        oSvg.removeChild(agvSelect)
+        oSvg.removeChild(agvInfoSelect)
+      }
+      oSvg.appendChild(agvSelect)
+      oSvg.appendChild(agvInfoSelect)
+    }
+
+    function agvBlur(agv, oSvg) {}
+
+    function createMap(mapdata, oSvg) {
+      let backgroundMapHref = './map/map.jpg'
+      let pointSize = 3
+      let pointColor = '#fffffe'
+      let pointOpacity = 0.7
+      let pathColor = '#0080008a'
+      let pathWidth = 2
+      let pathOpacity = 0.6
+      let pointFontSize = 5
+
+      if (mapObj == null) {
+        mapObj = structMapdata(mapdata)
+      }
+      if (scale == null) {
+        scale = getScale(mapdata)
+      }
+
+      // 底图绘制
+      if (mapObj['Point-0001'] != null && mapObj['Point-0002']) {
+        let p1 = mapObj['Point-0001']
+        let p2 = mapObj['Point-0002']
+        let backgroundMapX = p1.Map_x * scale
+        let backgroundMapY = p1.Map_y * scale
+        let backgroundMapWidth = (p2.Map_x - p1.Map_x) * scale
+        let backgroundMapHeight = (p2.Map_y - p1.Map_y) * scale
+        let backgroundMapTag = createSvgTag('image', {
+          id: 'backgroundMap',
+          // 'class':'agvTag',
+          x: backgroundMapX,
+          y: backgroundMapY,
+          width: backgroundMapWidth,
+          height: backgroundMapHeight,
+          // 'style': 'cursor: pointer;',
+          href: backgroundMapHref,
+          // 'href':{'baseVal':"./img/agv.png"},
+        })
+        oSvg.appendChild(backgroundMapTag)
+      }
+
+      // path绘制
+      mapdata.forEach((point) => {
+        let startPoint = point.Map_x * scale + ' ' + point.Map_y * scale
+        point.TargetPoint = JSON.parse(point.TargetPoint)
+        if (point.BezierControlPoints != null) {
+          point.BezierControlPoints = JSON.parse(point.BezierControlPoints)
+        } else {
+          point.BezierControlPoints = []
+        }
+
+        point.TargetPoint.forEach((tp) => {
+          let endPoint =
+            mapObj[tp].Map_x * scale + ' ' + mapObj[tp].Map_y * scale
+          let tagDAttr = ''
+          if (
+            point.BezierControlPoints[point.TargetPoint.indexOf(tp)] != null
+          ) {
+            tagDAttr = 'M' + startPoint + ' C'
+            point.BezierControlPoints[point.TargetPoint.indexOf(tp)].forEach(
+              (aPoint) => {
+                tagDAttr =
+                  tagDAttr + ' ' + aPoint.x * scale + ' ' + aPoint.y * scale
+              }
+            )
+            tagDAttr = tagDAttr + ' ' + endPoint
+          } else {
+            tagDAttr = 'M' + startPoint + 'L' + endPoint
+          }
+
+          pathTag = createSvgTag('path', {
+            id: point.CurrentPoint + '---' + tp,
+            class: 'pathTag',
+            d: tagDAttr,
+            stroke: pathColor,
+            'stroke-width': pathWidth,
+            fill: 'none',
+            opacity: pathOpacity,
+            // style: 'cursor: pointer;visibility:hidden;',
+            style: 'visibility:hidden;',
+          })
+          oSvg.appendChild(pathTag)
+        })
+      })
+
+      // point绘制
+      mapdata.forEach((point) => {
+        if (
+          point.CurrentPoint == 'Point-0001' ||
+          point.CurrentPoint == 'Point-0002'
+        ) {
+          return false
+        }
+        pointTag = createSvgTag('rect', {
+          id: point.CurrentPoint,
+          class: 'pointTag',
+          x: point.Map_x * scale - (1 / 2) * pointSize,
+          y: point.Map_y * scale - (1 / 2) * pointSize,
+          fill: pointColor,
+          width: pointSize,
+          height: pointSize,
+          opacity: pointOpacity,
+          // 'stroke':"black",
+          // 'stroke-width':"1"
+          style: 'cursor: pointer;',
+        })
+        pointTag.onmouseenter = () => {
+          objectFocus(point, oSvg, pointSize, pointFontSize)
+        }
+
+        pointTag.onmouseleave = () => {
+          objectBlur(point, oSvg)
+        }
+
+        oSvg.appendChild(pointTag)
+      })
+    }
+
+    let agvTaskList = {}
+
+    function agvMove(mapdata, agvListDate, oSvg) {
+      let agvImgWidth = 28
+      let agvImgHeight = 14
+      let agvFontSize = 5
+      let agvImg = './img/keriAGV.png'
+      let agvFontColor = '#804000'
+      let agvFontBgColor = '#d5d5d5'
+      let agvFontBgOpacity = 0.8
+      let agvFontStrokeColor = '#383838'
+
+      if (mapObj == null) {
+        mapObj = structMapdata(mapdata)
+      }
+      if (scale == null) {
+        scale = getScale(mapdata)
+      }
+
+      let agvImgCEdge = Math.sqrt(
+        Math.pow(agvImgHeight, 2) + Math.pow(agvImgWidth, 2)
+      )
+
+      agvListDate.rows.forEach((agv) => {
+
+        if (
+          agv.On_line == '上線' &&
+          agv.RfidNow != 0 &&
+          mapObj[switchPo(agv.RfidNow)] != null
+        ) {
+          let pointNowName = switchPo(agv.RfidNow)
+          let agvNowPoint = mapObj[pointNowName]
+          let pointToName = switchPo(agv.RfidTo)
+          let agvToPoint = mapObj[pointToName]
+          let pointYetName = switchPo(agv.RfidYet)
+          let agvYetPoint = mapObj[pointYetName]
+
+          if (agvNowPoint != null) {
+            //路线绘制
+            if (agv.TaskList != null && agv.TaskList.length != 0) {
+              let taskIndex = agv.TaskSchedule
+              let taskList = agv.TaskList
+
+              // 要绿的线
+              for (let i = taskIndex; i < agv.TaskList.length - 1; i++) {
+                let toLightPathId =
+                  taskList[i].TagId + '---' + taskList[i + 1].TagId
+                let toLightPath = document.getElementById(toLightPathId)
+                if (toLightPath != null) {
+                  toLightPath.setAttribute(
+                    'style',
+                    // 'cursor: pointer;visibility:visible;'
+                    'visibility:visible;'
+                  )
+                }
+              }
+              // 隐藏的线
+              for (let j = 0; j < taskIndex; j++) {
+                let toHiddenPathId =
+                  taskList[j].TagId + '---' + taskList[j + 1].TagId
+                let toHiddenPath = document.getElementById(toHiddenPathId)
+                if (toHiddenPath != null) {
+                  toHiddenPath.setAttribute(
+                    'style',
+                    // 'cursor: pointer;visibility:hidden;'
+                    'visibility:hidden;'
+                  )
+                }
+              }
+            }
+
+            // agvNowPoint.HeadingAngleForMap = JSON.parse(agvNowPoint.HeadingAngleForMap)
+            let agvAngle = 0
+            let agvSysAngle = agv.HeadingAngle
+            // 角度为空则自动判断
+            if (agvSysAngle != null) {
+              agvAngle = switchRadian(Number(agvSysAngle))
+            } else {
+              if (agvToPoint != null && agvToPoint != 0) {
+                // let angleIndex = agvNowPoint.TargetPoint.indexOf(agvToPoint.CurrentPoint)
+                // if (angleIndex != -1) {
+                //   agvAngle = Number(agvNowPoint.HeadingAngleForMap[angleIndex])
+                // }
+                agvAngle = -Math.atan2(
+                  agvToPoint.Map_y * scale - agvNowPoint.Map_y * scale,
+                  agvToPoint.Map_x * scale - agvNowPoint.Map_x * scale
+                )
+              } else if (agvYetPoint != null && agvYetPoint != 0) {
+                agvAngle = -Math.atan2(
+                  agvNowPoint.Map_y * scale - agvYetPoint.Map_y * scale,
+                  agvNowPoint.Map_x * scale - agvYetPoint.Map_x * scale
+                )
+              } else {
+                agvFakeToPoint = mapObj[agvNowPoint.TargetPoint[0]]
+                if (agvFakeToPoint != null) {
+                  agvAngle = -Math.atan2(
+                    agvFakeToPoint.Map_y * scale - agvNowPoint.Map_y * scale,
+                    agvFakeToPoint.Map_x * scale - agvNowPoint.Map_x * scale
+                  )
+                }
+              }
+            }
+
+            let agvX = agvNowPoint.Map_x * scale
+            let agvY = agvNowPoint.Map_y * scale
+
+            // let agvX = agvNowPoint.Map_x*scale - Math.cos(agvAngle - Math.atan2(agvImgHeight , agvImgWidth)) * (agvImgCEdge / 2)
+            // let agvY = agvNowPoint.Map_y*scale + Math.sin(agvAngle - Math.atan2(agvImgHeight , agvImgWidth)) * (agvImgCEdge / 2)
+            let fontX = agvNowPoint.Map_x * scale
+            // let fontY = agvNowPoint.Map_y*scale
+            // let fontY = agvNowPoint.Map_y*scale + (agvImgCEdge / 2)
+            // while (agvAngle < 0) {
+            //   agvAngle += 2 * Math.PI;
+            // }
+            let fontY =
+              agvNowPoint.Map_y * scale -
+              Math.abs(
+                Math.sin(agvAngle - Math.atan2(agvImgHeight, agvImgWidth))
+              ) *
+                (agvImgCEdge / 2)
+
+            let agvOnSvg = document.getElementById(agv.AgvId)
+            if (agvOnSvg == null) {
+              let agvImgTag = createSvgTag('image', {
+                id: agv.AgvId + 'Img',
+                class: 'agvImgTag',
+                x: -agvImgWidth / 2,
+                y: -agvImgHeight / 2,
+                width: agvImgWidth,
+                height: agvImgHeight,
+                style: 'cursor: pointer;',
+                href: agvImg,
+                // 'href':{'baseVal':"./img/agv.png"},
+              })
+
+              let agvBgTag = createSvgTag('circle', {
+                id: agv.AgvId + 'Bg',
+                class: 'agvBgTag',
+                // cx: -agvImgWidth / 2,
+                // cy: -agvImgHeight / 2,
+                r: agvImgWidth / 2,
+                fill: 'none',
+                // stroke:"red",
+                // 'stroke-width':"5",
+                // 'stroke-opacity':"0.1",
+              })
+
+              let agvTag = createSvgTag('g', {
+                id: agv.AgvId,
+                style: 'cursor: pointer;',
+              })
+
+              agvTag.appendChild(agvBgTag)
+              agvTag.appendChild(agvImgTag)
+
+              let agvFontInitX = 0
+              let agvFontInitY = -agvFontSize * 1.5
+              let agvFontTag = createSvgTag('text', {
+                id: agv.AgvId + 'Font',
+                class: 'agvFontTag',
+                x: agvFontInitX,
+                y: agvFontInitY,
+                'font-size': agvFontSize,
+                fill: agvFontColor,
+                'text-anchor': 'middle',
+                // 'style': 'cursor: pointer;',
+              })
+
+              agvFontTag.innerHTML = agv.AgvId
+
+              let agvFontBgHeight = agvFontSize * 1.8
+              // let agvFontBgWidth = agvFontSize * 4.5
+              let agvFontBgWidth = String(agv.AgvId).length * agvFontSize * 0.8
+              let agvFontBgInitX = -agvFontBgWidth / 2
+              let agvFontBgInitY = -agvFontBgHeight / 2 - agvFontSize * 1.8
+              let agvFontBgTag = createSvgTag('rect', {
+                id: agv.AgvId + 'FontBg',
+                class: 'agvFontBgTag',
+                x: agvFontBgInitX,
+                y: agvFontBgInitY,
+                width: agvFontBgWidth,
+                height: agvFontBgHeight,
+                rx: (agvFontSize * 2) / 5,
+                ry: (agvFontSize * 2) / 5,
+                fill: agvFontBgColor,
+                opacity: agvFontBgOpacity,
+                stroke: agvFontStrokeColor,
+                'stroke-width': agvFontSize / 10,
+              })
+
+              let agvInfoTag = createSvgTag('g', {
+                id: agv.AgvId + 'Info',
+                style: 'cursor: pointer;',
+              })
+
+              agvInfoTag.appendChild(agvFontBgTag)
+              agvInfoTag.appendChild(agvFontTag)
+
+              // agvTag.onmouseenter = () => {
+              //   agvFocus(agv, oSvg)
+              // }
+              // agvInfoTag.onmouseleave = () => {
+              //   agvBlur(agv, oSvg)
+              // }
+              agvTag.onclick = () => {
+                agvClick(agv)
+              }
+              agvInfoTag.onclick = () => {
+                agvClick(agv)
+              }
+
+              oSvg.appendChild(agvTag)
+              oSvg.appendChild(agvInfoTag)
+
+              d3.select('#' + agv.AgvId)
+                // .transition()
+                // .duration(1000)
+                .attr(
+                  'transform',
+                  `translate(${agvX},${agvY})  rotate(${-switchAngle(
+                    agvAngle
+                  )})`
+                )
+
+              d3.select('#' + agv.AgvId + 'Info')
+                // .transition()
+                // .duration(1000)
+                .attr('transform', `translate(${fontX},${fontY})  `)
+
+              if (agv.AgvStopReasonS != null && agv.AgvStopReasonS[0] == '') {
+                d3.select('#' + agv.AgvId + 'Bg').attr(
+                  'style',
+                  'animation: aniGreen 3s linear infinite;'
+                )
+              } else if (
+                agv.AgvStopReasonS != null &&
+                agv.AgvStopReasonS[0] != ''
+              ) {
+                d3.select('#' + agv.AgvId + 'Bg').attr(
+                  'style',
+                  'animation: aniRed 3s linear infinite;'
+                )
+              }
+            } else {
+              // agv移动
+              d3.select('#' + agv.AgvId)
+                .transition()
+                .duration(1000)
+                .attr(
+                  'transform',
+                  `translate(${agvX},${agvY})  rotate(${-switchAngle(
+                    agvAngle
+                  )})`
+                )
+
+              // Info移动
+              d3.select('#' + agv.AgvId + 'Info')
+                .transition()
+                .duration(1000)
+                .attr('transform', `translate(${fontX},${fontY})  `)
+
+              if (agv.AgvStopReasonS != null && agv.AgvStopReasonS[0] == '') {
+                d3.select('#' + agv.AgvId + 'Bg').attr(
+                  'style',
+                  'animation: aniGreen 3s linear infinite;'
+                )
+              } else if (
+                agv.AgvStopReasonS != null &&
+                agv.AgvStopReasonS[0] != ''
+              ) {
+                d3.select('#' + agv.AgvId + 'Bg').attr(
+                  'style',
+                  'animation: aniRed 3s linear infinite;'
+                )
+              }
+            }
+          }
+        } else {
+          let notExistAgv = document.getElementById(agv.AgvId)
+          let notExistAgvFont = document.getElementById(agv.AgvId + 'Info')
+
+          if (notExistAgv != null) {
+            oSvg.removeChild(notExistAgv)
+            oSvg.removeChild(notExistAgvFont)
+          }
+        }
+
+        let agvInfoCard = document.getElementById('agvInfoCard')
+        if(agvInfoCard.style.visibility == 'visible' && agvInfoClick == agv.AgvId){
+          agvInfoCardUpdate(agv)
+        }
+
+      })
+    }
+
+    createMap(mapdata, oSvg)
+    console.log(structMapdata(mapdata))
+    agvMove(mapdata, agvListDate, oSvg)
+
+    // 移动演示
+    // 移动演示
+    let agvIndex = 0
+    taskLen = agvListDate.rows[0].TaskList.length
+    setInterval(function () {
+      if (agvIndex < taskLen) {
+        agvListDate.rows[0].RfidNow =
+          agvListDate.rows[0].TaskList[agvIndex].Rfid
+        if (
+          agvListDate.rows[0].TaskList[agvIndex].TagId == 'Po-35' &&
+          agvListDate.rows[0].TaskList[agvIndex + 1].TagId != 'Po-35'
+        ) {
+          agvListDate.rows[0].HeadingAngle = '180.0'
+        } else if (
+          agvListDate.rows[0].TaskList[agvIndex].TagId == 'Po-72' &&
+          agvListDate.rows[0].TaskList[agvIndex + 1].TagId != 'Po-72'
+        ) {
+          agvListDate.rows[0].HeadingAngle = '90.0'
+        } else if (
+          agvListDate.rows[0].TaskList[agvIndex].TagId == 'Po-65' &&
+          agvListDate.rows[0].TaskList[agvIndex + 1].TagId != 'Po-65'
+        ) {
+          agvListDate.rows[0].HeadingAngle = '0.0'
+        }
+
+        if (agvIndex < taskLen - 1) {
+          agvListDate.rows[0].RfidTo =
+            agvListDate.rows[0].TaskList[agvIndex + 1].Rfid
+        }
+        agvListDate.rows[0].TaskSchedule = agvIndex
+        agvIndex++
+        // console.log(123)
+        agvMove(mapdata, agvListDate, oSvg)
+      } else {
+        return false
+      }
+    }, 1000)
+    // 移动演示
+    // 移动演示
+
+
+    
+
+    // 关闭信息框
+    function agvInfoCardClose(){
+      let agvInfoCardTag = document.getElementById('agvInfoCard')
+      agvInfoCardTag.style.visibility = 'hidden'
+    }
+    
+
+
+    //搜索框选定搜索物
+    function selectSearchObject(val,name) {
+      let searchObject = document.getElementById('searchObject')
+      searchObject.setAttribute('value',val)
+      searchObject.innerText = name
+    }
+
+
+    // 定位到选定物
+    function locateSearchObject() {
+      let searchObject = document.getElementById('searchObject')
+      let searchContent = document.getElementById('searchContent')
+      let searchObjectVal = searchObject.getAttribute('value')
+      let searchContentVal = searchContent.value
+      if (searchObjectVal == 'point') {
+        locatePoint(searchContentVal)
+      } else if (searchObjectVal == 'agv') {
+        locateAgv(searchContentVal)
+      }
+
+    }
+
+
+    // 定位点位
+    function locatePoint(pointName) {
+        let pointSize = 3
+        let pointFontSize = 5
+
+        // let pointName = document.getElementById('pointName').value
+
+        if (searchPointRes.pointName != pointName) {
+          searchPointRes.pointList = []
+          searchPointRes.selectNum = 0
+          searchPointRes.pointName = pointName
+          mapdata.forEach((point) => {
+            if (
+              point.CurrentPoint == 'Point-0001' ||
+              point.CurrentPoint == 'Point-0002'
+            ) {
+              return false
+            }
+            if (point.CurrentPoint.indexOf(pointName) != -1) {
+              searchPointRes.pointList.push(point)
+            }
+          })
+        }
+
+        let selectNum = searchPointRes.selectNum
+        let pointListLen = searchPointRes.pointList.length
+        let pointList = searchPointRes.pointList
+        let lastPoint = searchPointRes.lastPoint
+        if (pointListLen > 0) {
+          if (lastPoint != null) {
+            // let tempPoint = document.getElementById(searchPointRes.lastPoint.CurrentPoint)
+            // tempPoint.removeAttribute('stroke')
+            // tempPoint.removeAttribute('stroke-width')
+            // tempPoint.removeAttribute('stroke-opti')
+            objectBlur(searchPointRes.lastPoint, oSvg)
+          }
+
+          searchPointRes.selectNum = (selectNum + 1) % pointListLen
+          let selectPoint = pointList[selectNum]
+          // document.getElementById(selectPoint.CurrentPoint).setAttribute('stroke' , 'red')
+          // document.getElementById(selectPoint.CurrentPoint).setAttribute('stroke-width' , 2)
+          // document.getElementById(selectPoint.CurrentPoint).setAttribute('stroke-opti' , 2)
+          objectFocus(selectPoint, oSvg, pointSize, pointFontSize)
+          searchPointRes.lastPoint = selectPoint
+          // console.log(selectPoint)
+          svgPanZoom.setCenter(
+            selectPoint.Map_x * scale,
+            selectPoint.Map_y * scale
+          )
+        }
+      }
+
+    // 定位agv
+    function locateAgv(agvName) {
+        // let agvName = document.getElementById('agvName').value
+
+        if (searchAgvRes.agvName != agvName) {
+          searchAgvRes.agvList = []
+          searchAgvRes.selectNum = 0
+          searchAgvRes.agvName = agvName
+          agvListDate.rows.forEach((agv) => {
+            if (
+              agv.AgvId.indexOf(agvName) != -1 &&
+              agv.On_line == '上線' &&
+              agv.RfidNow != 0 &&
+              mapObj[switchPo(agv.RfidNow)] != null
+            ) {
+              searchAgvRes.agvList.push(agv)
+            }
+          })
+        }
+
+        let selectNum = searchAgvRes.selectNum
+        let agvListLen = searchAgvRes.agvList.length
+        let agvList = searchAgvRes.agvList
+        let lastAgv = searchAgvRes.lastAgv
+        if (agvListLen > 0) {
+          searchAgvRes.selectNum = (selectNum + 1) % agvListLen
+          let selectAgv = agvList[selectNum]
+          searchAgvRes.lastAgv = selectAgv
+          let selectAgvTag = document.getElementById(selectAgv.AgvId)
+          let transformAttr = selectAgvTag.getAttribute('transform')
+          // console.log(transformAttr)
+          if (transformAttr != null) {
+            let agvX = transformAttr.substring(
+              transformAttr.indexOf('(') + 1,
+              transformAttr.indexOf(',')
+            )
+            let agvY = transformAttr.substring(
+              transformAttr.indexOf(',') + 1,
+              transformAttr.indexOf(')')
+            )
+            // console.log(agvX)
+            // console.log(agvY)
+            svgPanZoom.setCenter(agvX, agvY)
+          }
+        }
+      }
+
+
+    // zoom
+    $(document).ready(function () {
+      svgPanZoom = $('#svgMap').svgPanZoom()
+      $('#reset-btn').click(function () {
+        svgPanZoom.reset()
+      })
+
+      $('#point-locate-btn').click(function () {
+        let pointSize = 3
+        let pointFontSize = 5
+
+        let pointName = document.getElementById('pointName').value
+
+        if (searchPointRes.pointName != pointName) {
+          searchPointRes.pointList = []
+          searchPointRes.selectNum = 0
+          searchPointRes.pointName = pointName
+          mapdata.forEach((point) => {
+            if (
+              point.CurrentPoint == 'Point-0001' ||
+              point.CurrentPoint == 'Point-0002'
+            ) {
+              return false
+            }
+            if (point.CurrentPoint.indexOf(pointName) != -1) {
+              searchPointRes.pointList.push(point)
+            }
+          })
+        }
+
+        let selectNum = searchPointRes.selectNum
+        let pointListLen = searchPointRes.pointList.length
+        let pointList = searchPointRes.pointList
+        let lastPoint = searchPointRes.lastPoint
+        if (pointListLen > 0) {
+          if (lastPoint != null) {
+            // let tempPoint = document.getElementById(searchPointRes.lastPoint.CurrentPoint)
+            // tempPoint.removeAttribute('stroke')
+            // tempPoint.removeAttribute('stroke-width')
+            // tempPoint.removeAttribute('stroke-opti')
+            objectBlur(searchPointRes.lastPoint, oSvg)
+          }
+
+          searchPointRes.selectNum = (selectNum + 1) % pointListLen
+          let selectPoint = pointList[selectNum]
+          // document.getElementById(selectPoint.CurrentPoint).setAttribute('stroke' , 'red')
+          // document.getElementById(selectPoint.CurrentPoint).setAttribute('stroke-width' , 2)
+          // document.getElementById(selectPoint.CurrentPoint).setAttribute('stroke-opti' , 2)
+          objectFocus(selectPoint, oSvg, pointSize, pointFontSize)
+          searchPointRes.lastPoint = selectPoint
+          // console.log(selectPoint)
+          svgPanZoom.setCenter(
+            selectPoint.Map_x * scale,
+            selectPoint.Map_y * scale
+          )
+        }
+      })
+
+      $('#agv-locate-btn').click(function () {
+        let agvName = document.getElementById('agvName').value
+
+        if (searchAgvRes.agvName != agvName) {
+          searchAgvRes.agvList = []
+          searchAgvRes.selectNum = 0
+          searchAgvRes.agvName = agvName
+          agvListDate.rows.forEach((agv) => {
+            if (
+              agv.AgvId.indexOf(agvName) != -1 &&
+              agv.On_line == '上線' &&
+              agv.RfidNow != 0 &&
+              mapObj[switchPo(agv.RfidNow)] != null
+            ) {
+              searchAgvRes.agvList.push(agv)
+            }
+          })
+        }
+
+        let selectNum = searchAgvRes.selectNum
+        let agvListLen = searchAgvRes.agvList.length
+        let agvList = searchAgvRes.agvList
+        let lastAgv = searchAgvRes.lastAgv
+        if (agvListLen > 0) {
+          searchAgvRes.selectNum = (selectNum + 1) % agvListLen
+          let selectAgv = agvList[selectNum]
+          searchAgvRes.lastAgv = selectAgv
+          let selectAgvTag = document.getElementById(selectAgv.AgvId)
+          let transformAttr = selectAgvTag.getAttribute('transform')
+          // console.log(transformAttr)
+          if (transformAttr != null) {
+            let agvX = transformAttr.substring(
+              transformAttr.indexOf('(') + 1,
+              transformAttr.indexOf(',')
+            )
+            let agvY = transformAttr.substring(
+              transformAttr.indexOf(',') + 1,
+              transformAttr.indexOf(')')
+            )
+            // console.log(agvX)
+            // console.log(agvY)
+            svgPanZoom.setCenter(agvX, agvY)
+          }
+        }
+      })
+
+      $('#scale-up').click(function () {
+        svgPanZoom.zoomIn()
+      })
+
+      $('#scale-down').click(function () {
+        svgPanZoom.zoomOut()
+      })
+
+      $('#scroll-up').click(function () {
+        svgPanZoom.panUp()
+      })
+
+      $('#scroll-down').click(function () {
+        svgPanZoom.panDown()
+      })
+
+      $('#scroll-left').click(function () {
+        svgPanZoom.panLeft()
+      })
+
+      $('#scroll-right').click(function () {
+        svgPanZoom.panRight()
+      })
+    })
+  </script>
+</html>
