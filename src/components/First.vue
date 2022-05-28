@@ -4,6 +4,7 @@
       <div class="aside-left fl">
         <div class="top left-top">
           <h3>任务状态</h3>
+          <div class="agv-num">任务数: {{taskNum}}</div>
           <div id="pie2" style="width: 90%; height: 80%;margin-left:10px"></div>
         </div>
         <div class="bottom left-bottom">
@@ -410,7 +411,8 @@ export default {
       voltageList: [],
       safeList: [],
       safeList1: [],
-      abList: []
+      abList: [],
+      taskNum : 0
     };
   },
   methods: {
@@ -637,6 +639,10 @@ export default {
       } else {
         this.ct = this.taskalltime / this.traffic;
       }
+      this.taskNum = 0
+      res.forEach(v=>{
+        this.taskNum += parseInt(v.value)
+      })
       if (JSON.stringify(this.list2) != JSON.stringify(res)) {
         this.list2 = res;
         document.getElementById("pie2").removeAttribute("_echarts_instance_");
