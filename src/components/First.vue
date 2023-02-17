@@ -4,7 +4,7 @@
       <div class="aside-left fl">
         <div class="top left-top">
           <h3>任务状态</h3>
-          <div class="agv-num">任务数: {{taskNum}}</div>
+          <div class="agv-num">任务数: {{ taskNum }}</div>
           <div id="pie2" style="width: 90%; height: 80%;margin-left:10px"></div>
         </div>
         <div class="bottom left-bottom">
@@ -19,28 +19,33 @@
             </el-carousel-item>
             <el-carousel-item>
               <el-table
-            :data="safeList1"
-            :row-class-name="tableRowClassName"
-            @row-click="goMap"
-            style="width: 95%"
-            height="320"
-          >
-            <!-- <el-table-column prop="level" label="异常等级" width="70">
+                :data="safeList1"
+                :row-class-name="tableRowClassName"
+                @row-click="goMap"
+                style="width: 95%"
+                height="320"
+              >
+                <!-- <el-table-column prop="level" label="异常等级" width="70">
             </el-table-column> -->
-            <el-table-column prop="agvId" label="影响车辆" width="70">
-            </el-table-column>
-            <el-table-column prop="code" label="分类" width="60">
-              <template slot-scope="scope">
-                <span style="color: red" v-if="scope.row.code === '电压(异常)'||scope.row.code === '电流(异常)'">{{
-                  scope.row.code
-                }}</span>
-                <span v-else style="color: #ff7b00">{{
-                  scope.row.code
-                }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="area" label="发生区域" width="80">
-              <!-- <template slot-scope="scope">
+                <el-table-column prop="agvId" label="影响车辆" width="70">
+                </el-table-column>
+                <el-table-column prop="code" label="分类" width="60">
+                  <template slot-scope="scope">
+                    <span
+                      style="color: red"
+                      v-if="
+                        scope.row.code === '电压(异常)' ||
+                          scope.row.code === '电流(异常)'
+                      "
+                      >{{ scope.row.code }}</span
+                    >
+                    <span v-else style="color: #ff7b00">{{
+                      scope.row.code
+                    }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="area" label="发生区域" width="80">
+                  <!-- <template slot-scope="scope">
                 <span v-if="scope.row.area === 'HA1F'">{{
                   "HA1F 物料仓"
                 }}</span>
@@ -49,17 +54,17 @@
                 }}</span>
                 <span v-else>{{ scope.row.area }}</span>
               </template> -->
-            </el-table-column>
-            <el-table-column prop="warn" label="管控值" width="60">
-            </el-table-column>
-            <el-table-column prop="real" label="实际值" width="60">
-            </el-table-column>
-            <!-- <el-table-column prop="time" label="持续时间" width="70">
+                </el-table-column>
+                <el-table-column prop="warn" label="管控值" width="60">
+                </el-table-column>
+                <el-table-column prop="real" label="实际值" width="60">
+                </el-table-column>
+                <!-- <el-table-column prop="time" label="持续时间" width="70">
               <template slot-scope="scope"
                 >{{ (scope.row.time / 60).toFixed(1) }}min</template
               >
             </el-table-column> -->
-          </el-table>
+              </el-table>
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -142,7 +147,8 @@
                       :duration="1000"
                       class="card-panel-num"
                     />
-                    <p>km</p>
+                    <p v-if="floor === ''">equator</p>
+                    <p v-else>km</p>
                   </div>
                 </div>
               </div>
@@ -292,15 +298,24 @@
             <el-table-column prop="code" label="异常代码" width="80">
             </el-table-column>
             <el-table-column prop="area" label="发生区域" width="80">
-              <template slot-scope="scope">
+              <!-- <template slot-scope="scope">
                 <span v-if="scope.row.area === 'HA1F'">{{
-                  "HA1F 物料仓"
+                  "HA1F 物料搬运"
+                }}</span>
+                <span v-else-if="scope.row.area === 'HA2F'">{{
+                  "HA2F LCM1內物流"
+                }}</span>
+                <span v-else-if="scope.row.area === 'HA3F'">{{
+                  "HA3F LCM1內物流"
                 }}</span>
                 <span v-else-if="scope.row.area === 'HB2F'">{{
                   "HB2F 集散中心-SMT"
                 }}</span>
+                <span v-else-if="scope.row.area === 'HB3F'">{{
+                  "HB3F LCM2內物流"
+                }}</span>
                 <span v-else>{{ scope.row.area }}</span>
-              </template>
+              </template> -->
             </el-table-column>
             <el-table-column prop="agvId" label="影响车辆" width="70">
             </el-table-column>
@@ -342,10 +357,7 @@ export default {
     this.getList();
     this.getMileage();
     this.getSafe();
-    setTimeout(() => {
-          this.getBar2();
-        }, 1000);
-    
+
     this.timer.push(
       setInterval(() => {
         this.getTime();
@@ -390,7 +402,7 @@ export default {
       pos: 0, // 二维数组的索引
       switchtime: 10000,
       km: 0,
-      allNum: 33,
+      allNum: 50,
       area: "",
       fullscreen: false,
       teleport: true,
@@ -409,10 +421,11 @@ export default {
       b: 0,
       currentList: [],
       voltageList: [],
+      tempList: [],
       safeList: [],
       safeList1: [],
       abList: [],
-      taskNum : 0
+      taskNum: 0
     };
   },
   methods: {
@@ -424,32 +437,27 @@ export default {
       this.fullscreen = fullscreen;
     },
     async goMap(row) {
-      if (row.area === "HA1F") {
+      if (row.area.slice(0, 4) === "HA1F") {
         await this.$refs.child.chooseHa1f();
         setTimeout(() => {
           this.$refs.child.locateAgv(row.agvId);
         }, 2000);
-      } else if (row.area === "HA1F LCM1內物流") {
-        await this.$refs.child.chooseHa1f1();
-        setTimeout(() => {
-          this.$refs.child.locateAgv(row.agvId);
-        }, 2000);
-      } else if (row.area === "HA2F LCM1內物流") {
+      } else if (row.area.slice(0, 4) === "HA2F") {
         await this.$refs.child.chooseHa2f();
         setTimeout(() => {
           this.$refs.child.locateAgv(row.agvId);
         }, 2000);
-      } else if (row.area === "HA3F LCM1內物流") {
+      } else if (row.area.slice(0, 4) === "HA3F") {
         await this.$refs.child.chooseHa3f();
         setTimeout(() => {
           this.$refs.child.locateAgv(row.agvId);
         }, 2000);
-      } else if (row.area === "HB2F") {
+      } else if (row.area.slice(0, 4) === "HB2F") {
         await this.$refs.child.chooseHb2f();
         setTimeout(() => {
           this.$refs.child.locateAgv(row.agvId);
         }, 2000);
-      } else if (row.area === "HB3F LCM2內物流") {
+      } else if (row.area.slice(0, 4) === "HB3F") {
         await this.$refs.child.chooseHb3f();
         setTimeout(() => {
           this.$refs.child.locateAgv(row.agvId);
@@ -545,10 +553,19 @@ export default {
       if (floor !== undefined) {
         this.floor = floor;
       }
-      const { data: res } = await this.$http.post("/getstatusList", {
+      const { data: res } = await this.$http.post("/aaa/getstatusList", {
         floor: this.floor,
         type: ""
       });
+      if(this.floor === 'HB3F' || this.floor === '') {
+        const { data: res1 } = await this.$http.post("/api/getstatusList", {
+          floor: '',
+          type: ""
+        });
+        res1.forEach(agv => {
+          res.push(agv)
+        })
+      }
       // this.statuslist = res
       this.agvNum = res.length;
       let i = 0;
@@ -625,24 +642,41 @@ export default {
       if (floor !== undefined) {
         this.floor = floor;
       }
-      const { data: res } = await this.$http.post("/gettaskList", {
+      const { data: res } = await this.$http.post("/aaa/gettaskList", {
         starttime: this.starttime,
         endtime: this.endtime,
         floor: this.floor
       });
-      this.taskalltime = parseFloat(res[0]["value"]);
-      res.shift();
-      this.traffic = parseInt(res[0]["value"]);
-      res.shift();
+      if(this.floor === 'HB3F' || this.floor === '') {
+        const { data: res1} = await this.$http.post("/api/gettaskList", {
+          starttime: this.starttime,
+          endtime: this.endtime,
+          floor: ''
+        });
+        this.taskalltime = parseFloat(res[0].value) +  parseFloat(res1[0].value);
+        res.shift();
+        res1.shift();
+        this.traffic = parseInt(res[0].value) +  parseInt(res1[0].value);
+        res.shift();
+        res1.shift();
+        res1.forEach((item,index) => {
+          res[index].value = parseInt(item.value) + parseInt(res[index].value)
+        })
+      } else {
+        this.taskalltime = parseFloat(res[0].value);
+        res.shift();
+        this.traffic = parseInt(res[0].value);
+        res.shift();
+      }
       if (this.traffic === 0) {
         this.ct = 0;
       } else {
         this.ct = this.taskalltime / this.traffic;
       }
-      this.taskNum = 0
-      res.forEach(v=>{
-        this.taskNum += parseInt(v.value)
-      })
+      this.taskNum = 0;
+      res.forEach(v => {
+        this.taskNum += parseInt(v.value);
+      });
       if (JSON.stringify(this.list2) != JSON.stringify(res)) {
         this.list2 = res;
         document.getElementById("pie2").removeAttribute("_echarts_instance_");
@@ -737,66 +771,77 @@ export default {
       let bar2 = this.$echarts.init(document.getElementById("bar2"));
       let echartsid = document.getElementById("bar2");
 
+      const seriesLabel = {
+        show: true
+      };
       var option = {
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow"
+          }
+        },
         legend: {
+          data: ["正常", "警告", "异常"],
           textStyle: {
             color: "#fff"
           }
         },
-        tooltip: {},
-        dataset: {
-          source: [
-            ["product", "异常", "警告", "正常"],
-            this.voltageList,
-            this.currentList,
-            ["温度", 0, 0, this.agvNum]
-          ]
+        grid: {
+          left: 50
         },
         xAxis: {
-          type: "category",
+          type: "value",
           axisLabel: {
-            color: "#fff"
+            formatter: "{value}",
+            textStyle: {
+              color: "#fff"
+            }
+          },
+          splitLine: {
+            lineStyle: {
+              color: "#bbb"
+            }
           }
         },
         yAxis: {
-          splitLine: {
-            lineStyle: {
-              color: "rgba(255,255,255,.3)"
-            }
-          },
+          type: "category",
+          inverse: true,
+          data: ["电压", "电流", "温度"],
           axisLabel: {
-            color: "#fff"
+            margin: 20,
+            textStyle: {
+              color: "#fff"
+            },
+            rich: {
+              value: {
+                lineHeight: 30,
+                align: "center"
+              }
+            }
           }
         },
-        // Declare several bar series, each will be mapped
-        // to a column of dataset.source by default.
         series: [
           {
+            name: "正常",
             type: "bar",
-            color: "red",
-            label: {
-              show: true,
-              position: "inside",
-              color: "#fff"
-            }
+            data: this.voltageList,
+            label: seriesLabel,
+            color: '#06eb00'
           },
           {
+            name: "警告",
             type: "bar",
-            color: "#ff7b00",
-            label: {
-              show: true,
-              position: "inside",
-              color: "#fff"
-            }
+            label: seriesLabel,
+            data: this.currentList,
+            color: 'rgb(223,183,86)'
           },
           {
+            name: "异常",
             type: "bar",
-            color: "#06eb00",
-            label: {
-              show: true,
-              position: "inside",
-              color: "#fff"
-            }
+            label: seriesLabel,
+            data: this.tempList,
+            color: 'red'
           }
         ]
       };
@@ -810,133 +855,44 @@ export default {
       EleResize.on(echartsid, listener);
     },
     async getSafe(floor) {
-       if (floor !== undefined) {
+      if (floor !== undefined) {
         this.floor = floor;
       }
-      const {data: res} = await this.$http.post('/getSafeList',{floor:this.floor})
+      const { data: res } = await this.$http.post("/aaa/getSafeList", {
+        floor: this.floor
+      });
+      if(this.floor === 'HB3F' || this.floor === '') {
+        const { data: res1 } = await this.$http.post("/api/getSafeList", {
+          floor: ''
+        });
+        res1.forEach(agv => {
+          res.push(agv)
+        })
+      }
       // const res = [
       //   {
       //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
       //     area: "HA1F LCM1内物流",
       //     status: "充电",
       //     time: 30
       //   },
       //   {
       //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
       //     area: "HA1F LCM1內物流",
       //     status: "充电",
       //     time: 30
       //   },
       //   {
       //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
-      //     area: "HA1F内物流",
-      //     status: "充电",
-      //     time: 30
-      //   },
-      //   {
-      //     agvId: "agv001",
-      //     voltage: 50,
-      //     current: 50,
-      //     temperature: 40,
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
       //     area: "HA1F内物流",
       //     status: "充电",
       //     time: 30
@@ -945,7 +901,7 @@ export default {
       //     agvId: "agv001",
       //     voltage: "",
       //     current: "",
-      //     temperature: 40,
+      //     temperature: "",
       //     area: "HA1F内物流",
       //     status: "充电",
       //     time: 30
@@ -954,7 +910,7 @@ export default {
       //     agvId: "agv001",
       //     voltage: "",
       //     current: "",
-      //     temperature: 40,
+      //     temperature: "",
       //     area: "HA1F内物流",
       //     status: "充电",
       //     time: 30
@@ -963,7 +919,7 @@ export default {
       //     agvId: "agv001",
       //     voltage: "",
       //     current: "",
-      //     temperature: 40,
+      //     temperature: "",
       //     area: "HA1F内物流",
       //     status: "充电",
       //     time: 30
@@ -972,7 +928,106 @@ export default {
       //     agvId: "agv001",
       //     voltage: "",
       //     current: "",
-      //     temperature: 40,
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: 80,
+      //     current: 55,
+      //     temperature: 66,
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: "",
+      //     current: "",
+      //     temperature: "",
+      //     area: "HA1F内物流",
+      //     status: "充电",
+      //     time: 30
+      //   },
+      //   {
+      //     agvId: "agv001",
+      //     voltage: 57,
+      //     current: 50,
+      //     temperature: 10,
       //     area: "HA1F内物流",
       //     status: "充电",
       //     time: 30
@@ -983,93 +1038,159 @@ export default {
       let c = 0;
       let d = 0;
       let e = 0;
+      let g = 0;
+      let h = 0;
+      let z = 0;
+      let x = 0;
 
       res.forEach(v => {
-        if (v.voltage === "" || v.current === "") {
+        if (v.voltage === "") {
           a++;
-        } else if (v.voltage > 56.5 && v.voltage < 37.5) {
-          b++;
-        }else if (
+        } else if (
           v.voltage >= 37.5 &&
+          v.voltage < 39.4 ||
           v.voltage <= 56.5 &&
-          v.voltage < 39.4 &&
           v.voltage > 54.4
         ) {
           c++;
-        } else if (v.current >55 && v.current < -55) {
+        } else if (v.voltage > 56.5 || v.voltage < 37.5) {
+          b++;
+        } else {
+          a++;
+        }
+
+
+        if (v.current === "") {
+          z++;
+        } else  if (v.current > 55 || v.current < -55) {
           d++;
-        } else if (v.current > 49.5 && v.current <= 55 && v.current >= -55 && v.current < -49.5) {
+        } else  if (
+          v.current > 49.5 &&
+          v.current <= 55 ||
+          v.current >= -55 &&
+          v.current < -49.5
+        ) {
           e++;
+        } else {
+          z++;
+        }
+
+        if (v.temperature === "") {
+          x++;
+        } else if (v.temperature > 64 && v.temperature <= 80) {
+          g++;
+        } else if (v.temperature > 80) {
+          h++;
+        } else {
+          x++;
         }
       });
-      this.voltageList = ["电压", b, c, a];
-      this.currentList = ["电流", d, e, a];
-      this.safeList = res.filter(v => v.voltage !== "" || v.current !== "");
+      this.voltageList = [a, z, x];
+      this.currentList = [c, e, g];
+      this.tempList = [b, d, h];
+      this.safeList = res.filter(v=> v.voltage !== "" && v.current !== "" && v.temperature !== "")
       this.safeList1 = [];
       this.safeList.forEach(v => {
-        if (v.voltage > 56.5 && v.voltage < 37.5) {
+        if (v.voltage > 56.5 || v.voltage < 37.5) {
           this.safeList1.push({
             agvId: v.agvId,
             code: "电压(异常)",
             area: v.area,
-            warn: '56.5>x>37.5',
+            warn: "56.5>x>37.5",
             real: v.voltage
           });
-        } else if ( v.voltage >= 37.5 &&
+        } else if (
+          v.voltage >= 37.5 &&
+          v.voltage < 39.4 ||
           v.voltage <= 56.5 &&
-          v.voltage < 39.4 &&
-          v.voltage > 54.4) {
+          v.voltage > 54.4
+        ) {
           this.safeList1.push({
             agvId: v.agvId,
             code: "电压(警告)",
             area: v.area,
-            warn: '54.5>x,x<39.4',
+            warn: "54.5>x,x<39.4",
             real: v.voltage
           });
-        } else if (v.current >55 && v.current < -55) {
+        }
+        if (v.current > 55 || v.current < -55) {
           this.safeList1.push({
             agvId: v.agvId,
             code: "电流(异常)",
             area: v.area,
-            warn: 'x>55,x<-55',
+            warn: "x>55,x<-55",
             real: v.current
           });
-        } else if (v.current > 49.5 && v.current <= 55 && v.current >= -55 && v.current < -49.5) {
+        } else if (
+          v.current > 49.5 &&
+          v.current <= 55 ||
+          v.current >= -55 &&
+          v.current < -49.5
+        ) {
           this.safeList1.push({
             agvId: v.agvId,
             code: "电流(警告)",
             area: v.area,
-            warn: 'x>49.5,x<-49.5',
+            warn: "x>49.5,x<-49.5",
             real: v.current
           });
         }
+        if(v.temperature > 64 && v.temperature <= 80) {
+          this.safeList1.push({
+            agvId: v.agvId,
+            code: "温度(警告)",
+            area: v.area,
+            warn: "x>64,x<=80",
+            real: v.temperature
+          });
+        } else if(v.temperature > 80) {
+          this.safeList1.push({
+            agvId: v.agvId,
+            code: "温度(异常)",
+            area: v.area,
+            warn: "x>80",
+            real: v.temperature
+          });
+        }
       });
-      this.getBar2();
+      setTimeout(() => {
+        this.getBar2();
+      }, 1000);
     },
     async getErr(floor) {
       if (floor !== undefined) {
         this.floor = floor;
       }
-      const { data: res } = await this.$http.post("/getMissionList", {
+      const { data: res } = await this.$http.post("/aaa/getMissionList", {
         starttime: this.starttime,
         endtime: this.endtime,
         floor: this.floor
       });
-      this.errTime = res[0]["value"];
-      res.shift();
-      this.abidleTime = res[0]["value"];
-      res.shift();
-      this.abnormal = parseInt(res[0]["value"]);
+      if(this.floor === 'HB3F' || this.floor === '') {
+        const { data: res1 } = await this.$http.post("/api/getMissionList", {
+          starttime: this.starttime,
+          endtime: this.endtime,
+          floor: ''
+        });
+        this.errTime =  parseFloat(res[0].value) + parseFloat(res1[0].value)
+        this.abidleTime =  parseFloat(res[1].value) + parseFloat(res1[1].value)
+        this.abnormal =  parseFloat(res[2].value) + parseFloat(res1[2].value)
+        this.abidle =  parseFloat(res[3].value) + parseFloat(res1[3].value)
+      } else {
+        this.errTime = res[0].value;
+        this.abidleTime = res[1].value;
+        this.abnormal = parseInt(res[2].value);
+        this.abidle = parseInt(res[3].value);
+      }
+
       if (this.abnormal === 0) {
         this.mtbf = this.time * this.agvNum;
         this.mttr = 0;
       } else {
-        this.mtbf = (this.time / this.abnormal ) * this.agvNum;
+        this.mtbf = (this.time / this.abnormal) * this.agvNum;
         this.mttr = this.errTime / this.abnormal;
       }
-      res.shift();
-      this.abidle = parseInt(res[0]["value"]);
-      res.shift();
+
       if (this.agvNum === 0) {
         this.down = 0;
         this.normal = 0;
@@ -1086,7 +1207,11 @@ export default {
       this.getErr(data);
       this.getList(data);
       this.getSafe(data);
-      this.km = mileage;
+      if(data === "") {
+        this.km = parseFloat(mileage/40076)
+      } else {
+        this.km = mileage;
+      }
       this.tkm = today;
       this.allNum = agv;
       this.timer.push(
@@ -1118,10 +1243,19 @@ export default {
       if (floor !== undefined) {
         this.floor = floor;
       }
-      const { data: res } = await this.$http.post("/getstatusList", {
+      const { data: res } = await this.$http.post("/aaa/getstatusList", {
         floor: this.floor,
         type: "DOWN"
       });
+      if(this.floor === 'HB3F' || this.floor === '') {
+        const { data: res1 } = await this.$http.post("/api/getstatusList", {
+          floor: "",
+          type: "DOWN"
+        });
+        res1.forEach(agv => {
+          res.push(agv)
+        })
+      }
       // const res = [
       //   {
       //     agvId:"agv006",
@@ -1136,10 +1270,10 @@ export default {
       );
       this.erragv = this.tableData1.length;
       this.tableData1.forEach(agv => {
-        if(agv.status === "Ab_Normal IDLE") {
-          this.abList.push(agv.agvId)
+        if (agv.status === "Ab_Normal IDLE") {
+          this.abList.push(agv.agvId);
         }
-      })
+      });
     },
     handleCurrentChange(val) {
       console.log(val);
@@ -1151,18 +1285,29 @@ export default {
       console.log(`当前页: ${val}`);
     },
     async getMileage() {
-      const { data: res } = await this.$http.post("/getSystemInfo", {
+      const { data: res } = await this.$http.post("/aaa/getSystemInfo", {
         query: {},
         pagenum: "",
         pagesize: "",
         floor: ""
       });
+      if(this.floor === 'HB3F' || this.floor === '') {
+        const { data: res1 } = await this.$http.post("/api/getSystemInfo", {
+          query: {},
+          pagenum: "",
+          pagesize: "",
+          floor: ""
+        });
+        res1.forEach(agv => {
+          res.push(agv)
+        })
+      }
 
       res.forEach(agv => {
         this.a += parseInt(agv.agvList.mileage);
         this.b += parseFloat(agv.agvList.mileage - agv.agvList.todaymileage);
       });
-      this.km = this.a;
+      this.km = parseFloat(this.a/40076);
       this.tkm = this.b;
       this.a = 0;
       this.b = 0;

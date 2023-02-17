@@ -45,31 +45,29 @@
                 border
                 :row-class-name="tableRowClassName"
                 style="width: 95%"
+                :height="600"
                 :cell-style="styleCar"
                 @current-change="handleCurrentChange"
               >
-                <el-table-column type="index"></el-table-column>
-                <el-table-column prop="name" label="设备名称">
+                <el-table-column prop="agvList.agvId" label="车号">
                 </el-table-column>
-                <el-table-column prop="code" label="设备编号">
+                <el-table-column prop="agvList.abnormal" label="异常状态"> </el-table-column>
+                <el-table-column prop="agvList.agvArea" label="当前位置">
                 </el-table-column>
-                <el-table-column prop="ip" label="IP" width="100">
+                <el-table-column prop="agvList.taskId" label="任务单号" >
                 </el-table-column>
-                <el-table-column prop="taskState" label="任务状态">
+                <el-table-column prop="agvList.taskStatus" label="任务状态">
                 </el-table-column>
-                <el-table-column prop="carState" label="设备状态">
+                <el-table-column prop="agvList.fromto" label="From-To">
                 </el-table-column>
-                <el-table-column prop="location" label="位置">
+                <el-table-column prop="agvList.now" label="当前卡号">
                 </el-table-column>
-                <el-table-column prop="id" label="任务ID"> </el-table-column>
-                <el-table-column prop="electricity" label="电量">
+                <el-table-column prop="agvList.speed" label="速度"> </el-table-column>
+                <el-table-column prop="agvList.batteryLevel" label="电量">
                 </el-table-column>
-                <el-table-column prop="num" label="充电次数"> </el-table-column>
-                <el-table-column prop="mileage" label="里程"> </el-table-column>
-                <el-table-column prop="rate" label="充电速率">
-                </el-table-column>
+                <el-table-column prop="agvList.cargo" label="载货状态"> </el-table-column>
               </el-table>
-              <el-pagination
+              <!-- <el-pagination
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :current-page="currentPage4"
@@ -79,7 +77,7 @@
                 :total="400"
                 background
               >
-              </el-pagination>
+              </el-pagination> -->
             </div>
           </el-drawer>
 
@@ -467,164 +465,7 @@ export default {
         // 当前每页显示多少条数据
         pageSize: 5
       },
-      tableData: [
-        {
-          name: "二维码AGV",
-          code: "AGV2",
-          ip: "10.189.10.2",
-          taskState: "任务中",
-          carState: "正常",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV1",
-          ip: "10.189.10.3",
-          taskState: "任务中",
-          carState: "正常",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV3",
-          ip: "10.189.10.6",
-          taskState: "待指派",
-          carState: "离线",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV6",
-          ip: "10.189.10.2",
-          taskState: "任务中",
-          carState: "正常",
-          location: "电梯口",
-          id: "202101",
-          electricity: "50%",
-          num: "5次",
-          mileage: "1500m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        },
-        {
-          name: "二维码AGV",
-          code: "AGV5",
-          ip: "10.189.10.2",
-          taskState: "待指派",
-          carState: "充电",
-          location: "电梯口",
-          id: "202102",
-          electricity: "50%",
-          num: "4次",
-          mileage: "1480m",
-          rate: "2min/%"
-        }
-      ],
+      tableData: [],
       tableData1: [
         {
           name: "二维码AGV",
@@ -688,6 +529,7 @@ export default {
     };
   },
   mounted() {
+    this.getAgvList()
     this.getSpeed();
   },
   computed: {
@@ -698,6 +540,16 @@ export default {
   methods: {
     handleClose(done) {
       done();
+    },
+    async getAgvList() {
+      const { data: res } = await this.$http.post("/getSystemInfo", {
+        query: {},
+        pagenum: "",
+        pagesize: "",
+        floor: ''
+      });
+      this.tableData = res
+
     },
     handleFullscreen() {},
     changeTask(percentage) {
@@ -710,7 +562,6 @@ export default {
       return "电量" + "\n" + "\n" + percentage + "%";
     },
     changeTitle(percentage) {
-      console.log(percentage);
       return "总里程" + "\n" + "\n" + "20km";
     },
     handleClick(tab, event) {

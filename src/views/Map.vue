@@ -12,7 +12,7 @@
     <!-- 全部楼层地图 -->
     <div class="all_floor" v-show="active">
       <img src="../assets/img/1F.png" alt="" @click="chooseHa1f" />
-      <img src="../assets/img/1F.png" alt="" @click="chooseHa1f1" />
+      <img src="../assets/img/1F.png" alt="" @click="chooseHa1f" />
       <img src="../assets/img/HA2F.png" alt="" @click="chooseHa2f" />
       <img src="../assets/img/HB2F.png" alt="" @click="chooseHb2f" />
       <img src="../assets/img/HA3F.png" alt="" @click="chooseHa3f" />
@@ -23,22 +23,22 @@
     <div class="floor-btn">
       <el-button type="primary" :plain="all" @click="changeAll">全部</el-button>
       <el-button type="primary" :plain="ha1f1" @click="chooseHa1f"
-        >HA-1F物料仓</el-button
+        >HA-1F</el-button
       >
-      <el-button type="primary" :plain="ha1f2" @click="chooseHa1f1"
+      <!-- <el-button type="primary" :plain="ha1f2" @click="chooseHa1f1"
         >HA-1FLCM1内物流</el-button
-      >
+      > -->
       <el-button type="primary" :plain="ha2f" @click="chooseHa2f"
-        >HA-2FLCM1内物流</el-button
-      >
-      <el-button type="primary" :plain="hb2f" @click="chooseHb2f"
-        >HB-2F集散中心</el-button
+        >HA-2F</el-button
       >
       <el-button type="primary" :plain="ha3f" @click="chooseHa3f"
-        >HA-3FLCM1内物流</el-button
+        >HA-3F</el-button
+      >
+      <el-button type="primary" :plain="hb2f" @click="chooseHb2f"
+        >HB-2F</el-button
       >
       <el-button type="primary" :plain="hb3f" @click="chooseHb3f"
-        >HB-3FLCM2内物流</el-button
+        >HB-3F</el-button
       >
     </div>
     <!-- 切换楼层按钮 -->
@@ -237,24 +237,7 @@ export default {
       receiveTrafficData: {},
       Ha1fBtn1: {
         floor: "HA1F",
-        area: "HA1F1",
-        MapHref: require("../assets/img/1F.svg"),
-        temp1: {
-          currentPoint: "Point-0002",
-          map_x: 556202,
-          map_y: 226343,
-          targetPoint: []
-        },
-        temp: {
-          currentPoint: "Point-0001",
-          map_x: 101202,
-          map_y: 356343,
-          targetPoint: []
-        }
-      },
-      Ha1fBtn2: {
-        floor: "HA1F",
-        area: "HA1F2",
+        area: "HA1F",
         MapHref: require("../assets/img/1F.svg"),
         temp1: {
           currentPoint: "Point-0002",
@@ -309,14 +292,14 @@ export default {
         MapHref: require("../assets/img/HB2F.svg"),
         temp1: {
           currentPoint: "Point-0002",
-          map_x: "523947",
-          map_y: "076717",
+          map_x: 523947,
+          map_y: 76717,
           targetPoint: []
         },
         temp: {
           currentPoint: "Point-0001",
-          map_x: "068947",
-          map_y: "233559",
+          map_x: 68947,
+          map_y: 233559,
           targetPoint: []
         }
       },
@@ -326,15 +309,15 @@ export default {
         MapHref: require("../assets/img/HB3F.svg"),
         temp1: {
           currentPoint: "Point-0002",
-          map_x: "507791",
-          map_y: "079667",
+          map_x: 526231,
+          map_y: 80665,
           targetPoint: []
         },
 
         temp: {
           currentPoint: "Point-0001",
-          map_x: "311991",
-          map_y: "191067",
+          map_x: 71231,
+          map_y: 210665,
           targetPoint: []
         }
       },
@@ -350,7 +333,6 @@ export default {
   created() {},
   mounted() {
     // this.mapInit(this.Ha1fBtn1);
-
     this.checkDocVis();
   },
   beforeDestroy() {
@@ -403,7 +385,6 @@ export default {
       this.loading = true;
       this.all = false;
       this.ha1f1 = true;
-      this.ha1f2 = true;
       this.ha2f = true;
       this.ha3f = true;
       this.hb2f = true;
@@ -426,7 +407,7 @@ export default {
         this.$emit('mileage');
       }, 10000)
     );
-      this.$emit("floor", "", this.mileage, this.todaymileage, 33);
+      this.$emit("floor", "", this.mileage, this.todaymileage, 50);
     },
     async chooseHa2f() {
       await this.cleanTimer();
@@ -434,7 +415,6 @@ export default {
       this.loading = true;
       this.all = true;
       this.ha1f1 = true;
-      this.ha1f2 = true;
       this.ha2f = false;
       this.ha3f = true;
       this.hb2f = true;
@@ -456,7 +436,6 @@ export default {
       this.loading = true;
       this.all = true;
       this.ha1f1 = false;
-      this.ha1f2 = true;
       this.ha2f = true;
       this.ha3f = true;
       this.hb2f = true;
@@ -469,37 +448,36 @@ export default {
       map.innerHTML = "";
       this.mapData = [];
       await this.mapInit(this.Ha1fBtn1);
-      this.$emit("floor", "HA1F1", this.mileage, this.todaymileage, 6);
+      this.$emit("floor", "HA1F", this.mileage, this.todaymileage, 11);
     },
-    async chooseHa1f1() {
-      await this.cleanTimer();
-      this.active = false;
-      this.loading = true;
-      this.all = true;
-      this.ha1f1 = true;
-      this.ha1f2 = false;
-      this.ha2f = true;
-      this.ha3f = true;
-      this.hb2f = true;
-      this.hb3f = true;
-      this.mapObj = null;
-      this.scale = null;
-      this.isShow = false;
-      this.agvGreenPath = {};
-      const map = document.getElementById("svgMap");
-      map.innerHTML = "";
-      this.mapData = [];
-      await this.cleanTimer();
-      await this.mapInit(this.Ha1fBtn2);
-      this.$emit("floor", "HA1F2", this.mileage, this.todaymileage, 4);
-    },
+    // async chooseHa1f1() {
+    //   await this.cleanTimer();
+    //   this.active = false;
+    //   this.loading = true;
+    //   this.all = true;
+    //   this.ha1f1 = true;
+    //   this.ha1f2 = false;
+    //   this.ha2f = true;
+    //   this.ha3f = true;
+    //   this.hb2f = true;
+    //   this.hb3f = true;
+    //   this.mapObj = null;
+    //   this.scale = null;
+    //   this.isShow = false;
+    //   this.agvGreenPath = {};
+    //   const map = document.getElementById("svgMap");
+    //   map.innerHTML = "";
+    //   this.mapData = [];
+    //   await this.cleanTimer();
+    //   await this.mapInit(this.Ha1fBtn2);
+    //   this.$emit("floor", "HA1F2", this.mileage, this.todaymileage, 4);
+    // },
     async chooseHa3f() {
       await this.cleanTimer();
       this.active = false;
       this.loading = true;
       this.all = true;
       this.ha1f1 = true;
-      this.ha1f2 = true;
       this.ha2f = true;
       this.ha3f = false;
       this.hb2f = true;
@@ -521,7 +499,6 @@ export default {
       this.loading = true;
       this.all = true;
       this.ha1f1 = true;
-      this.ha1f2 = true;
       this.ha2f = true;
       this.ha3f = true;
       this.hb2f = false;
@@ -535,7 +512,7 @@ export default {
       this.mapData = [];
       await this.cleanTimer();
       await this.mapInit(this.Hb2fBtn);
-      this.$emit("floor", "HB2F", this.mileage, this.todaymileage, 8);
+      this.$emit("floor", "HB2F", this.mileage, this.todaymileage, 16);
     },
     async chooseHb3f() {
       await this.cleanTimer();
@@ -543,7 +520,6 @@ export default {
       this.loading = true;
       this.all = true;
       this.ha1f1 = true;
-      this.ha1f2 = true;
       this.ha2f = true;
       this.ha3f = true;
       this.hb2f = true;
@@ -557,7 +533,7 @@ export default {
       this.mapData = [];
       await this.cleanTimer();
       await this.mapInit(this.Hb3fBtn);
-      this.$emit("floor", "HB3F", this.mileage, this.todaymileage, 3);
+      this.$emit("floor", "HB3F", this.mileage, this.todaymileage, 11);
     },
     // 地图初始化
     mapInit(e) {
@@ -602,9 +578,17 @@ export default {
     },
     // 获取地图信息
     async getMapInfo(floor, temp, temp1, MapHref, area) {
-      const { data: res } = await this.$http.post("/getMapInfo", {
+      const { data: res } = await this.$http.post("/aaa/getMapInfo", {
         floor: floor
       });
+      if(floor === 'HB3F') {
+        const { data: res1 } = await this.$http.post("/api/getMapInfo", {
+          floor: ''
+        });
+        res1.forEach(v => {
+          res.push(v)
+        })
+      }
       this.mapData = res;
       // this.mapData = mapdata;
       this.mapData.push(temp);
@@ -616,12 +600,23 @@ export default {
     },
     // 获取agvList信息
     async getAgvState(area) {
-      const { data: res } = await this.$http.post("/getSystemInfo", {
+      const { data: res } = await this.$http.post("/aaa/getSystemInfo", {
         query: {},
         pagenum: "",
         pagesize: "",
         floor: area
       });
+      if(area === 'HB3F') {
+        const { data: res1 } = await this.$http.post("/api/getSystemInfo", {
+        query: {},
+        pagenum: "",
+        pagesize: "",
+        floor: ''
+      });
+        res1.forEach(v => {
+          res.push(v)
+        })
+      }
       // const { data: res } = await this.$http.post("/getSystemInfo")
       // this.agvListDate = res.data;
       this.agvListDate = res;
@@ -1375,7 +1370,12 @@ export default {
                 );
               } else if (
                 agv.agvList.abnormal === "管制点停止" ||
-                agv.agvList.abnormal === "障碍物阻挡停止"
+                agv.agvList.abnormal === "障碍物阻挡停止" ||
+                agv.agvList.abnormal === "货架读码校准失败" ||
+                agv.agvList.abnormal === "按下急停按钮停止" ||
+                agv.agvList.abnormal === "地面读码校准失败" ||
+                agv.agvList.abnormal === "移动目标位置错误" ||
+                agv.agvList.abnormal === "按键管制停止"
               ) {
                 d3.select("#" + agv.agvList.agvId + "Bg").attr(
                   "style",
@@ -1448,7 +1448,12 @@ export default {
                 );
               } else if (
                 agv.agvList.abnormal === "管制点停止" ||
-                agv.agvList.abnormal === "障碍物阻挡停止"
+                agv.agvList.abnormal === "障碍物阻挡停止" ||
+                agv.agvList.abnormal === "货架读码校准失败" ||
+                agv.agvList.abnormal === "按下急停按钮停止" ||
+                agv.agvList.abnormal === "地面读码校准失败" ||
+                agv.agvList.abnormal === "移动目标位置错误" ||
+                agv.agvList.abnormal === "按键管制停止"
               ) {
                 d3.select("#" + agv.agvList.agvId + "Bg").attr(
                   "style",

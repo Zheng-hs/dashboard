@@ -15,7 +15,12 @@ import 'vue-mini-player/lib/vue-mini-player.css'
 import fullscreen from 'vue-fullscreen'
 
 
-axios.defaults.baseURL = 'api'
+const BASE_URL = "";
+// 创建 axios 实例
+const service = axios.create({
+  baseURL: BASE_URL,
+  timeout: 20000 // 请求超时时间
+});
 // axios.defaults.baseURL = 'http://127.0.0.1:9000/'
 // 在request拦截器中，展示进度条 NProgress.start()
 axios.interceptors.request.use(config => {
